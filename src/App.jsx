@@ -73,9 +73,9 @@ function App() {
         gap: '1rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src="/src/assets/logo.png" alt="Logo" style={{ height: '40px' }} />
+          <img src="/src/assets/logo.png" alt="Premier Logo" style={{ height: '40px' }} />
           <h1 style={{ fontSize: '1.5rem', margin: 0, background: 'none', WebkitTextFillColor: 'initial', color: 'var(--text-color)' }}>
-            Premier Online Bible
+            Online Bible
           </h1>
         </div>
 
