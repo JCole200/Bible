@@ -10,12 +10,12 @@ const LexicalSuite = () => {
 
     const lexicalDatabase = {
         'words': {
-            'G5485': { lemma: 'χάρις', translit: 'charis', english: 'grace', def: 'unmerited favor, divine influence, gift', occurrences: 156, root: 'cheró', parsing: 'Noun, Feminine', etymology: 'From G5463; graciousness (as gratifying), of manner or act. Inherited from the PIE root *gher- "to desire; to want".' },
-            'G3056': { lemma: 'λόγος', translit: 'logos', english: 'word', def: 'speech, reason, divine expression', occurrences: 331, root: 'legó', parsing: 'Noun, Masculine', etymology: 'From G3004; something said (including the thought). Conceptually denotes the internal intention as well as the external expression.' },
-            'H7307': { lemma: 'רוּחַ', translit: 'ruach', english: 'spirit', def: 'wind, breath, mind, spirit', occurrences: 378, root: 'rachaq', parsing: 'Noun, Feminine', etymology: 'From H7306; wind; by resemblance breath, i.e. A sensible (or even violent) exhalation. Used to denote the Spirit of God.' },
-            'G2316': { lemma: 'Θεός', translit: 'Theos', english: 'God', def: 'Deity, Supreme Being, Magistrate', occurrences: 1317, root: 'tithemi', parsing: 'Noun, Masculine', etymology: 'Of uncertain affinity; a deity, especially (with G3588) the supreme Divinity. Related to the concept of the "Placer" or "Creator".' },
-            'G25': { lemma: 'ἀγαπάω', translit: 'agapaō', english: 'love', def: 'to love deeply, to prize, to be fond of', occurrences: 143, root: 'agapa', parsing: 'Verb, Present', etymology: 'Perhaps from agan (much); to love (in a social or moral sense). Distinct from phileo which denotes sisterly/brotherly affection.' },
-            'G3772': { lemma: 'οὐρανός', translit: 'ouranos', english: 'heaven', def: 'the sky, the abode of God, the universe', occurrences: 273, root: 'oros', parsing: 'Noun, Masculine', etymology: 'Perhaps from the same as g1093 (through the idea of elevation); the sky; by extension heaven (as the abode of God).' }
+            'G5485': { lemma: 'χάρις', translit: 'charis', english: 'grace', def: 'unmerited favor, divine influence, gift', occurrences: 156, root: 'cheró', parsing: 'Noun, Feminine', etymology: 'From G5463; graciousness (as gratifying), of manner or act. Inherited from the PIE root *gher- "to desire; to want".', semanticField: ['Charity', 'Favor', 'Gratitude', 'Joy'] },
+            'G3056': { lemma: 'λόγος', translit: 'logos', english: 'word', def: 'speech, reason, divine expression', occurrences: 331, root: 'legó', parsing: 'Noun, Masculine', etymology: 'From G3004; something said (including the thought). Conceptually denotes the internal intention as well as the external expression.', semanticField: ['Logic', 'Reason', 'Speech', 'Intent'] },
+            'H7307': { lemma: 'רוּחַ', translit: 'ruach', english: 'spirit', def: 'wind, breath, mind, spirit', occurrences: 378, root: 'rachaq', parsing: 'Noun, Feminine', etymology: 'From H7306; wind; by resemblance breath, i.e. A sensible (or even violent) exhalation. Used to denote the Spirit of God.', semanticField: ['Breath', 'Wind', 'Divine', 'Soul'] },
+            'G2316': { lemma: 'Θεός', translit: 'Theos', english: 'God', def: 'Deity, Supreme Being, Magistrate', occurrences: 1317, root: 'tithemi', parsing: 'Noun, Masculine', etymology: 'Of uncertain affinity; a deity, especially (with G3588) the supreme Divinity. Related to the concept of the "Placer" or "Creator".', semanticField: ['Elohim', 'Creator', 'Supreme', 'Majesty'] },
+            'G25': { lemma: 'ἀγαπάω', translit: 'agapaō', english: 'love', def: 'to love deeply, to prize, to be fond of', occurrences: 143, root: 'agapa', parsing: 'Verb, Present', etymology: 'Perhaps from agan (much); to love (in a social or moral sense). Distinct from phileo which denotes sisterly/brotherly affection.', semanticField: ['Agape', 'Prize', 'Affection', 'Benevolence'] },
+            'G3772': { lemma: 'οὐρανός', translit: 'ouranos', english: 'heaven', def: 'the sky, the abode of God, the universe', occurrences: 273, root: 'oros', parsing: 'Noun, Masculine', etymology: 'Perhaps from the same as g1093 (through the idea of elevation); the sky; by extension heaven (as the abode of God).', semanticField: ['Eternity', 'Sky', 'Abode', 'Glory'] }
         },
         'verses': {
             'john 1:1': [
@@ -35,15 +35,15 @@ const LexicalSuite = () => {
         }
     };
 
-    const handleSearch = async () => {
-        const query = searchTerm.toLowerCase().trim();
+    const handleSearch = async (overrideQuery = null) => {
+        const query = (overrideQuery || searchTerm).toLowerCase().trim();
         if (!query) return;
 
         setIsAnalyzing(true);
         setInterlinearVerse([]);
         setSelectedWord(null);
 
-        if (searchMode === 'verse') {
+        if (searchMode === 'verse' && !overrideQuery) {
             try {
                 const cached = lexicalDatabase.verses[query] || lexicalDatabase.verses[query.replace(/\s+/g, '')];
                 if (cached) {
@@ -83,7 +83,7 @@ const LexicalSuite = () => {
             } finally {
                 setIsAnalyzing(false);
             }
-        } else { // searchMode === 'lexicon'
+        } else { // searchMode === 'lexicon' or overrideQuery exists
             setTimeout(() => {
                 const word = Object.values(lexicalDatabase.words).find(w =>
                     w.english.toLowerCase().includes(query) ||
@@ -103,7 +103,8 @@ const LexicalSuite = () => {
                         parsing: 'Adaptive-Lexeme',
                         occurrences: 'Calculating across corpora...',
                         etymology: `Analyzing potential root derivatives for "${query}" across Semitic and Hellenistic linguistic spheres...`,
-                        root: 'Neural Mapping'
+                        root: 'Neural Mapping',
+                        semanticField: ['Context', 'Origin', 'Derivative']
                     };
                     handleWordClick(synthesizedWord);
                 }
@@ -221,11 +222,25 @@ const LexicalSuite = () => {
 
                         <div className="semantic-map-box">
                             <label>Semantic Field Mapping</label>
+                            <p className="semantic-hint">Select a node to pivot research to related concepts.</p>
                             <div className="semantic-map">
                                 <div className="node-center">{selectedWord.english}</div>
-                                <div className="node-orbit" style={{ '--angle': '0deg' }}>Core</div>
-                                <div className="node-orbit" style={{ '--angle': '120deg' }}>Intent</div>
-                                <div className="node-orbit" style={{ '--angle': '240deg' }}>Context</div>
+                                {(selectedWord.semanticField || ['Context', 'Origin', 'Derivative']).map((field, i) => (
+                                    <div
+                                        key={i}
+                                        className="node-orbit interactive"
+                                        style={{ '--angle': `${(i * (360 / (selectedWord.semanticField?.length || 3)))}deg` }}
+                                        onClick={() => {
+                                            setSearchTerm(field);
+                                            // Trigger search for this new term
+                                            setSearchMode('lexicon');
+                                            handleSearch(field);
+                                        }}
+                                    >
+                                        <div className="node-puck"></div>
+                                        <span>{field}</span>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

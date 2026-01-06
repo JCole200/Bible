@@ -1022,6 +1022,37 @@
     background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
 }
 
+.node-orbit.interactive {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.node-orbit.interactive:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    transform: rotate(var(--angle)) translate(120px) rotate(calc(-1 * var(--angle))) scale(1.1);
+}
+
+.node-puck {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-color);
+}
+
+.semantic-hint {
+    font-size: 0.75rem;
+    opacity: 0.4;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
 .node-center {
     background: var(--accent-color);
     color: white;
