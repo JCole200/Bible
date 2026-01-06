@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import jerusalemAncient from '../../assets/maps/jerusalem_ancient.png';
+import jerusalemModern from '../../assets/maps/jerusalem_modern.png';
+import capernaumAncient from '../../assets/maps/capernaum_ancient.png';
+import capernaumModern from '../../assets/maps/capernaum_modern.png';
+import galileeAncient from '../../assets/maps/galilee_ancient.png';
+import galileeModern from '../../assets/maps/galilee_modern.png';
 
 const TimeTraveler = () => {
     const [layer, setLayer] = useState('ancient'); // ancient, modern
@@ -12,7 +18,9 @@ const TimeTraveler = () => {
             ancient: 'Aelia Capitolina',
             modern: 'Old City Basin',
             coords: '31.7683° N, 35.2137° E',
-            offset: { x: -5, y: -10 },
+            bgAncient: jerusalemAncient,
+            bgModern: jerusalemModern,
+            offset: { x: 0, y: 0 },
             discovery: "Recent excavations at the Southern Wall (Ophel) have uncovered 2,000-year-old purification baths (Mikva'ot) used by pilgrims entering the Temple. The Stratigraphy reveals a complex layering of Herodian, Byzantine, and Ummayad occupational levels.",
             stats: {
                 depth: '18.4m',
@@ -26,7 +34,9 @@ const TimeTraveler = () => {
             ancient: 'Kfar Nahum',
             modern: 'Archaeological Park',
             coords: '32.8811° N, 35.5752° E',
-            offset: { x: 15, y: -30 },
+            bgAncient: capernaumAncient,
+            bgModern: capernaumModern,
+            offset: { x: 0, y: 0 },
             discovery: "The 'Insula of Saint Peter' demonstrates 1st-century domestic architecture. Beneath the octagonal Byzantine church, excavations revealed a simple dwelling with early Christian graffiti, suggesting its use as an early 'domus-ecclesia'.",
             stats: {
                 depth: '4.2m',
@@ -40,7 +50,9 @@ const TimeTraveler = () => {
             ancient: 'Lake Gennesaret',
             modern: 'Lake Kinneret',
             coords: '32.8225° N, 35.5872° E',
-            offset: { x: 10, y: -20 },
+            bgAncient: galileeAncient,
+            bgModern: galileeModern,
+            offset: { x: 0, y: 0 },
             discovery: "A Roman-era shipwreck (The Jesus Boat) found in 1986 reveal construction techniques mentioned in the Gospels. The vessel was preserved in lake mud, allowing for comprehensive dendrochronological dating to the late 1st century BC.",
             stats: {
                 depth: '2.5m (Underwater)',
@@ -89,7 +101,12 @@ const TimeTraveler = () => {
                 <div className="map-viewport">
                     <div
                         className={`map-canvas-core ${layer}`}
-                        style={{ transform: `scale(1.5) translate(${activeLoc.offset.x}%, ${activeLoc.offset.y}%)` }}
+                        style={{
+                            backgroundImage: `url(${layer === 'ancient' ? activeLoc.bgAncient : activeLoc.bgModern})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            transform: 'scale(1)' // Reset to full view initially
+                        }}
                     >
                         <div className="map-grid-layer"></div>
                         <div className="map-topography-layer"></div>
