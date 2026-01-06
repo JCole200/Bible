@@ -10,14 +10,27 @@ const AudioPlayer = ({ textToRead, reference }) => {
 
     useEffect(() => {
         // Load voices
-        // Load voices
         const loadVoices = () => {
             let availableVoices = [...synth.getVoices()];
 
-            // Filter for UK English
-            let ukVoices = availableVoices.filter(v => v.lang.startsWith('en-GB') || v.lang.includes('GB'));
+            // Filter for standard UK English, excluding regional variants like Welsh/Scottish if possible
+            let ukVoices = availableVoices.filter(v => {
+                const lang = v.lang.toLowerCase();
+                const name = v.name.toLowerCase();
+                // Check for UK/GB markers
+                const isUK = lang.startsWith('en-gb') || lang.includes('gb');
+                // Exclude specific regional variants if they are causing issues
+                const isRegional = name.includes('welsh') || name.includes('scotland') || name.includes('ireland') || lang.includes('wls') || lang.includes('sct');
 
-            // If no UK voices, fallback to general English (US/AU/etc)
+                return isUK && !isRegional;
+            });
+
+            // If no standard UK voices, fallback to any UK English
+            if (ukVoices.length === 0) {
+                ukVoices = availableVoices.filter(v => v.lang.toLowerCase().startsWith('en-gb') || v.lang.includes('gb'));
+            }
+
+            // If still nothing, fallback to general English (US/etc)
             if (ukVoices.length === 0) {
                 ukVoices = availableVoices.filter(v => v.lang.startsWith('en'));
             }
@@ -30,12 +43,22 @@ const AudioPlayer = ({ textToRead, reference }) => {
             // Heuristic for "Human/Realistic" quality
             const getQualityScore = (voice) => {
                 const name = voice.name.toLowerCase();
-                if (name.includes('natural')) return 100;
-                if (name.includes('premium')) return 90;
-                if (name.includes('enhanced')) return 80;
-                if (name.includes('google')) return 70;
-                if (name.includes('daniel') || name.includes('serena') || name.includes('kate')) return 60;
-                return 0;
+                const lang = voice.lang.toLowerCase();
+                let score = 0;
+
+                if (name.includes('natural')) score += 100;
+                if (name.includes('premium')) score += 90;
+                if (name.includes('enhanced')) score += 80;
+                if (name.includes('google')) score += 70;
+
+                // Prioritize classic standard names
+                if (name.includes('daniel') || name.includes('kate') || name.includes('serena') || name.includes('oliver')) score += 60;
+
+                // Penalize regional variants that might have slipped through
+                if (name.includes('welsh') || lang.includes('wls')) score -= 200;
+                if (name.includes('scotland') || lang.includes('sct')) score -= 200;
+
+                return score;
             };
 
             // Find best Male
@@ -43,7 +66,8 @@ const AudioPlayer = ({ textToRead, reference }) => {
                 v.name.toLowerCase().includes('male') ||
                 v.name.toLowerCase().includes('daniel') ||
                 v.name.toLowerCase().includes('arthur') ||
-                v.name.toLowerCase().includes('oliver')
+                v.name.toLowerCase().includes('oliver') ||
+                v.name.toLowerCase().includes('james')
             ).sort((a, b) => getQualityScore(b) - getQualityScore(a));
 
             const maleVoice = maleCandidates[0];
@@ -76,16 +100,16 @@ const AudioPlayer = ({ textToRead, reference }) => {
                 finalVoices.push(...others.slice(0, 2 - finalVoices.length));
             }
 
-            setVoices(finalVoices.slice(0, 2));
+            const top2 = finalVoices.slice(0, 2);
+            setVoices(top2);
 
             // Auto-select first voice if none selected
-            if (finalVoices.length > 0) {
-                if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
-                    setSelectedVoice(finalVoices[0]);
+            if (top2.length > 0) {
+                if (!selectedVoice || !top2.find(v => v.name === selectedVoice.name)) {
+                    setSelectedVoice(top2[0]);
                 }
             }
         };
-
         loadVoices();
 
         // Chrome triggers this event when voices are ready
