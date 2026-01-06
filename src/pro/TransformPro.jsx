@@ -134,7 +134,12 @@ const TransformPro = ({
                         {activeTab === 'lexical' && <LexicalSuite />}
                         {activeTab === 'audio' && <CinematicAudio />}
                         {activeTab === 'retention' && <MemorySRS />}
-                        {activeTab === 'search' && <SearchTab />}
+                        {activeTab === 'search' && (
+                            <SearchTab
+                                onBookChange={onBookChange}
+                                onChapterChange={onChapterChange}
+                            />
+                        )}
                         {activeTab === 'notes' && <NotesFeature />}
                         {activeTab === 'cross' && <CrossReference />}
                     </div>
