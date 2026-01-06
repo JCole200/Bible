@@ -5,6 +5,10 @@ import capernaumAncient from '../../assets/maps/capernaum_ancient.png';
 import capernaumModern from '../../assets/maps/capernaum_modern.png';
 import galileeAncient from '../../assets/maps/galilee_ancient.png';
 import galileeModern from '../../assets/maps/galilee_modern.png';
+import nazarethAncient from '../../assets/maps/nazareth_ancient.png';
+import nazarethModern from '../../assets/maps/nazareth_modern.png';
+import bethlehemAncient from '../../assets/maps/bethlehem_ancient.png';
+import bethlehemModern from '../../assets/maps/bethlehem_modern.png';
 
 const TimeTraveler = () => {
     const [layer, setLayer] = useState('ancient'); // ancient, modern
@@ -20,7 +24,7 @@ const TimeTraveler = () => {
             coords: '31.7683° N, 35.2137° E',
             bgAncient: jerusalemAncient,
             bgModern: jerusalemModern,
-            offset: { x: 0, y: 0 },
+            cardPos: 'bottom-right',
             discovery: "Recent excavations at the Southern Wall (Ophel) have uncovered 2,000-year-old purification baths (Mikva'ot) used by pilgrims entering the Temple. The Stratigraphy reveals a complex layering of Herodian, Byzantine, and Ummayad occupational levels.",
             stats: {
                 depth: '18.4m',
@@ -36,7 +40,7 @@ const TimeTraveler = () => {
             coords: '32.8811° N, 35.5752° E',
             bgAncient: capernaumAncient,
             bgModern: capernaumModern,
-            offset: { x: 0, y: 0 },
+            cardPos: 'top-left',
             discovery: "The 'Insula of Saint Peter' demonstrates 1st-century domestic architecture. Beneath the octagonal Byzantine church, excavations revealed a simple dwelling with early Christian graffiti, suggesting its use as an early 'domus-ecclesia'.",
             stats: {
                 depth: '4.2m',
@@ -52,13 +56,45 @@ const TimeTraveler = () => {
             coords: '32.8225° N, 35.5872° E',
             bgAncient: galileeAncient,
             bgModern: galileeModern,
-            offset: { x: 0, y: 0 },
+            cardPos: 'bottom-left',
             discovery: "A Roman-era shipwreck (The Jesus Boat) found in 1986 reveal construction techniques mentioned in the Gospels. The vessel was preserved in lake mud, allowing for comprehensive dendrochronological dating to the late 1st century BC.",
             stats: {
                 depth: '2.5m (Underwater)',
                 certainty: '100%',
                 period: 'Late Herodian',
                 relics: 'Cedar/Oak Planking'
+            }
+        },
+        'nazareth': {
+            name: 'Nazareth',
+            ancient: 'Natzrat',
+            modern: 'Old City Nazareth',
+            coords: '32.7019° N, 35.3033° E',
+            bgAncient: nazarethAncient,
+            bgModern: nazarethModern,
+            cardPos: 'top-right',
+            discovery: "Limestone caves beneath the Basilica of the Annunciation show evidence of 1st-century domestic use, including grain silos and cisterns, typical of the small agricultural village of the Nativity era.",
+            stats: {
+                depth: '3.1m',
+                certainty: '92%',
+                period: 'Early Roman',
+                relics: 'Grain Silos, Stone Jars'
+            }
+        },
+        'bethlehem': {
+            name: 'Bethlehem',
+            ancient: 'Beit Lehem',
+            modern: 'Manger Square Area',
+            coords: '31.7054° N, 35.2024° E',
+            bgAncient: bethlehemAncient,
+            bgModern: bethlehemModern,
+            cardPos: 'bottom-right',
+            discovery: "Archaeological surveys in the core of Bethlehem have identified Iron Age II remnants and Herodian-era pottery, confirming the site's importance as a Judean ridge-top village.",
+            stats: {
+                depth: '5.8m',
+                certainty: '87%',
+                period: 'Herodian',
+                relics: 'Terra Sigillata, Oil Lamps'
             }
         }
     };
@@ -131,26 +167,28 @@ const TimeTraveler = () => {
                         <div className="target-marker-v2">
                             <div className="marker-ring"></div>
                             <div className="marker-point"></div>
-                            <div className="marker-data-card glass-panel">
-                                <span className="loc-title">{activeLoc.name}</span>
-                                <span className="loc-subtitle">{layer === 'ancient' ? activeLoc.ancient : activeLoc.modern}</span>
-                                <div className="live-telemetry">
-                                    <div className="tele-bar"></div>
-                                    <span>Signal Verified via Neural-Scan</span>
-                                </div>
-                            </div>
+                        </div>
+                    </div>
+
+                    {/* Data Card anchored to Viewport corner */}
+                    <div className={`marker-data-card glass-panel ${activeLoc.cardPos}`}>
+                        <span className="loc-title">{activeLoc.name}</span>
+                        <span className="loc-subtitle">{layer === 'ancient' ? activeLoc.ancient : activeLoc.modern}</span>
+                        <div className="live-telemetry">
+                            <div className="tele-bar"></div>
+                            <span>Signal Verified via Neural-Scan</span>
                         </div>
                     </div>
 
                     <div className="location-nav">
-                        {Object.keys(locations).map(key => (
+                        {Object.keys(locations).map(locId => (
                             <button
-                                key={key}
-                                className={currentRef === key ? 'active' : ''}
-                                onClick={() => { setCurrentRef(key); triggerScan(); }}
+                                key={locId}
+                                className={currentRef === locId ? 'active' : ''}
+                                onClick={() => { setCurrentRef(locId); triggerScan(); }}
                             >
-                                <span className="loc-puck"></span>
-                                {locations[key].name}
+                                <div className="btn-puck"></div>
+                                {locations[locId].name}
                             </button>
                         ))}
                     </div>

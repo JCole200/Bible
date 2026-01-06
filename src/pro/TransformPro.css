@@ -716,14 +716,39 @@
 
 .marker-data-card {
     position: absolute;
-    top: 20px;
-    left: 20px;
     padding: 0.8rem 1.2rem;
     min-width: 150px;
     border: 1px solid var(--accent-color);
     background: rgba(13, 17, 23, 0.95) !important;
     backdrop-filter: blur(8px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    pointer-events: none;
+    transition: all 0.5s ease;
+}
+
+.marker-data-card.top-left {
+    top: 20px;
+    left: 20px;
+}
+
+.marker-data-card.top-right {
+    top: 20px;
+    right: 20px;
+    left: auto;
+}
+
+.marker-data-card.bottom-left {
+    bottom: 20px;
+    left: 20px;
+    top: auto;
+}
+
+.marker-data-card.bottom-right {
+    bottom: 20px;
+    right: 20px;
+    top: auto;
+    left: auto;
 }
 
 .loc-title {
