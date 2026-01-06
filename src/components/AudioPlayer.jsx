@@ -118,51 +118,69 @@ const AudioPlayer = ({ textToRead, reference }) => {
         }
     }, []);
 
-    useEffect(() => {
-        // Cancel any ongoing speech when component unmounts or text changes
-        return () => {
-            synth.cancel();
-        };
-    }, [textToRead]);
+    const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
+    const chunksRef = useRef([]);
 
+    // Split text into chunks to avoid mobile timeouts (approx 200 chars or by sentence)
     useEffect(() => {
         if (textToRead) {
-            // Create a new utterance with optimized "realistic" settings
-            const utterance = new SpeechSynthesisUtterance(textToRead);
-            utterance.rate = 0.95; // Slightly faster than 0.9 for better flow
-            utterance.pitch = 1.0;
-
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-
-            utterance.onend = () => {
-                setIsPlaying(false);
-                setIsPaused(false);
-            };
-
-            utteranceRef.current = utterance;
+            // Split by sentence but keep them under reasonable length
+            const sentences = textToRead.match(/[^.!?]+[.!?]+/g) || [textToRead];
+            chunksRef.current = sentences.map(s => s.trim()).filter(s => s.length > 0);
+            setCurrentChunkIndex(0);
+            setIsPlaying(false);
+            setIsPaused(false);
+            synth.cancel();
         }
-    }, [textToRead, selectedVoice]);
+    }, [textToRead]);
+
+    const playChunk = (index) => {
+        if (index >= chunksRef.current.length) {
+            setIsPlaying(false);
+            setIsPaused(false);
+            setCurrentChunkIndex(0);
+            return;
+        }
+
+        synth.cancel(); // Clear any pending
+
+        const utterance = new SpeechSynthesisUtterance(chunksRef.current[index]);
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        if (selectedVoice) utterance.voice = selectedVoice;
+
+        utterance.onend = () => {
+            if (!isPaused) {
+                const nextIndex = index + 1;
+                setCurrentChunkIndex(nextIndex);
+                playChunk(nextIndex);
+            }
+        };
+
+        utterance.onerror = (event) => {
+            console.error("SpeechSynthesisUtterance error", event);
+            setIsPlaying(false);
+        };
+
+        utteranceRef.current = utterance;
+        synth.speak(utterance);
+    };
 
     const handlePlay = () => {
         if (isPaused) {
-            synth.resume();
+            // On mobile, resume is buggy, better to just restart the current chunk
+            playChunk(currentChunkIndex);
             setIsPaused(false);
             setIsPlaying(true);
         } else {
-            synth.cancel(); // effective reset
-            if (utteranceRef.current) {
-                // Re-assign voice in case it changed
-                if (selectedVoice) utteranceRef.current.voice = selectedVoice;
-                synth.speak(utteranceRef.current);
-                setIsPlaying(true);
-            }
+            setIsPlaying(true);
+            setIsPaused(false);
+            playChunk(currentChunkIndex);
         }
     };
 
     const handlePause = () => {
-        synth.pause();
+        synth.cancel(); // On mobile, cancel is safer than pause for stopping activity
         setIsPlaying(false);
         setIsPaused(true);
     };
@@ -171,10 +189,10 @@ const AudioPlayer = ({ textToRead, reference }) => {
         synth.cancel();
         setIsPlaying(false);
         setIsPaused(false);
+        setCurrentChunkIndex(0);
     };
 
     const getVoiceLabel = (voice) => {
-        // Intelligent labeling
         if (voice.name.includes('Male') || voice.name.includes('Daniel') || voice.name.includes('Arthur')) {
             return "Male (UK)";
         }
@@ -203,11 +221,8 @@ const AudioPlayer = ({ textToRead, reference }) => {
                         onChange={(e) => {
                             const voice = voices.find(v => v.name === e.target.value);
                             setSelectedVoice(voice);
-                            // Stop current if playing to avoid mixed voices
                             if (isPlaying) {
-                                synth.cancel();
-                                setIsPlaying(false);
-                                setIsPaused(false);
+                                handleStop();
                             }
                         }}
                         style={{
@@ -230,21 +245,17 @@ const AudioPlayer = ({ textToRead, reference }) => {
             </div>
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                {!isPlaying && !isPaused ? (
+                {!isPlaying ? (
                     <button onClick={handlePlay} title="Play">
-                        ▶ Listen
+                        ▶ {isPaused ? 'Resume' : 'Listen'}
                     </button>
-                ) : isPlaying ? (
+                ) : (
                     <button onClick={handlePause} title="Pause" className="secondary">
                         ⏸ Pause
                     </button>
-                ) : (
-                    <button onClick={handlePlay} title="Resume">
-                        ▶ Resume
-                    </button>
                 )}
 
-                {(isPlaying || isPaused) && (
+                {(isPlaying || isPaused || currentChunkIndex > 0) && (
                     <button onClick={handleStop} title="Stop" className="secondary">
                         ⏹ Stop
                     </button>
