@@ -1066,6 +1066,40 @@
     color: #f59e0b;
 }
 
+.analyzing-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.loader-pulse {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 20px var(--accent-color);
+}
+
+@keyframes loaderPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+}
+
 @media (max-width: 1024px) {
     .lexicon-grid {
         grid-template-columns: 1fr;
