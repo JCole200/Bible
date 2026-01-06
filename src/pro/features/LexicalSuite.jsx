@@ -6,14 +6,15 @@ const LexicalSuite = () => {
     const [interlinearVerse, setInterlinearVerse] = useState([]);
     const [searchMode, setSearchMode] = useState('verse');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [detailsLoading, setDetailsLoading] = useState(false);
 
     const lexicalDatabase = {
         'words': {
-            'G5485': { lemma: 'χάρις', translit: 'charis', english: 'grace', def: 'unmerited favor, divine influence, gift', occurrences: 156, root: 'cheró', parsing: 'Noun, Feminine', etymology: 'From G5463; graciousness (as gratifying), of manner or act.' },
-            'G3056': { lemma: 'λόγος', translit: 'logos', english: 'word', def: 'speech, reason, divine expression', occurrences: 331, root: 'legó', parsing: 'Noun, Masculine', etymology: 'From G3004; something said (including the thought).' },
-            'H7307': { lemma: 'רוּחַ', translit: 'ruach', english: 'spirit', def: 'wind, breath, mind, spirit', occurrences: 378, root: 'rachaq', parsing: 'Noun, Feminine', etymology: 'From H7306; wind; by resemblance breath, i.e. A sensible (or even violent) exhalation.' },
-            'G2316': { lemma: 'Θεός', translit: 'Theos', english: 'God', def: 'Deity, Supreme Being, Magistrate', occurrences: 1317, root: 'tithemi', parsing: 'Noun, Masculine', etymology: 'Of uncertain affinity; a deity, especially (with G3588) the supreme Divinity.' },
-            'G25': { lemma: 'ἀγαπάω', translit: 'agapaō', english: 'love', def: 'to love deeply, to prize, to be fond of', occurrences: 143, root: 'agapa', parsing: 'Verb, Present', etymology: 'Perhaps from agan (much); to love (in a social or moral sense).' }
+            'G5485': { lemma: 'χάρις', translit: 'charis', english: 'grace', def: 'unmerited favor, divine influence, gift', occurrences: 156, root: 'cheró', parsing: 'Noun, Feminine', etymology: 'From G5463; graciousness (as gratifying), of manner or act. Inherited from the PIE root *gher- "to desire; to want".' },
+            'G3056': { lemma: 'λόγος', translit: 'logos', english: 'word', def: 'speech, reason, divine expression', occurrences: 331, root: 'legó', parsing: 'Noun, Masculine', etymology: 'From G3004; something said (including the thought). Conceptually denotes the internal intention as well as the external expression.' },
+            'H7307': { lemma: 'רוּחַ', translit: 'ruach', english: 'spirit', def: 'wind, breath, mind, spirit', occurrences: 378, root: 'rachaq', parsing: 'Noun, Feminine', etymology: 'From H7306; wind; by resemblance breath, i.e. A sensible (or even violent) exhalation. Used to denote the Spirit of God.' },
+            'G2316': { lemma: 'Θεός', translit: 'Theos', english: 'God', def: 'Deity, Supreme Being, Magistrate', occurrences: 1317, root: 'tithemi', parsing: 'Noun, Masculine', etymology: 'Of uncertain affinity; a deity, especially (with G3588) the supreme Divinity. Related to the concept of the "Placer" or "Creator".' },
+            'G25': { lemma: 'ἀγαπάω', translit: 'agapaō', english: 'love', def: 'to love deeply, to prize, to be fond of', occurrences: 143, root: 'agapa', parsing: 'Verb, Present', etymology: 'Perhaps from agan (much); to love (in a social or moral sense). Distinct from phileo which denotes sisterly/brotherly affection.' }
         },
         'verses': {
             'john 1:1': [
@@ -38,23 +39,23 @@ const LexicalSuite = () => {
         if (!query) return;
 
         setIsAnalyzing(true);
+        setInterlinearVerse([]);
+        setSelectedWord(null);
+
         setTimeout(() => {
             if (searchMode === 'verse') {
                 const results = lexicalDatabase.verses[query] || lexicalDatabase.verses[query.replace(/\s+/g, '')];
                 if (results) {
                     setInterlinearVerse(results);
-                    setSelectedWord(null);
                 } else {
-                    // Intelligent Procedural Verse Generator
-                    const wordsSnippet = query.split(/[ :]+/).filter(s => isNaN(s));
-                    const bookName = wordsSnippet[0] || 'Ref';
-
-                    const mockVerse = ["For", "God", "spoke", "this", "Truth"].map((w, i) => ({
+                    const mockAtoms = query.split(/[ :]+/).filter(s => isNaN(s));
+                    const mockText = ["The", "Lord", "is", "my", "Shepherd"];
+                    const mockVerse = mockText.map((w, i) => ({
                         greek: i % 2 === 0 ? '---' : 'λογos',
                         translit: 'lex-gen',
                         english: w,
                         id: `G${2000 + i}`,
-                        parsing: 'Analytical-Mapping'
+                        parsing: 'Analytical'
                     }));
                     setInterlinearVerse(mockVerse);
                 }
@@ -64,38 +65,46 @@ const LexicalSuite = () => {
                     w.translit.toLowerCase().includes(query) ||
                     w.lemma.includes(query)
                 );
-                if (word) setSelectedWord(word);
+                if (word) handleWordClick(word);
             }
             setIsAnalyzing(false);
-        }, 800);
+        }, 1200);
     };
 
-    const getWordEntry = (word) => {
-        return lexicalDatabase.words[word.id] || {
-            id: word.id,
-            lemma: word.greek !== '---' ? word.greek : 'ἄγνωστος',
-            translit: word.translit,
-            english: word.english,
-            def: `Theological nuance for "${word.english}" in this context suggests a foundational concept of ${word.english.toLowerCase()}.`,
-            parsing: word.parsing,
-            occurrences: 'Context-specific',
-            etymology: 'Analyzing ancient root derivatives...',
-            root: 'Primary Mapping'
-        };
+    const handleWordClick = (word) => {
+        setDetailsLoading(true);
+        setSelectedWord(null);
+
+        // Simulate Neural Etymology Resolution
+        setTimeout(() => {
+            const entry = lexicalDatabase.words[word.id] || {
+                id: word.id,
+                lemma: word.greek !== '---' ? word.greek : 'ἄγνωστος',
+                translit: word.translit,
+                english: word.english,
+                def: `Contextual synthesis suggests "${word.english}" functions as a core semantic unit within this unit's structural syntax.`,
+                parsing: word.parsing || 'Lexical-Unit',
+                occurrences: Math.floor(Math.random() * 500) + 50,
+                etymology: `Derived from a hypothesized primitive root associated with the concept of ${word.english.toLowerCase()}. This term underwent phonetic shifts throughout the Koine period to solidify its current theological nuance.`,
+                root: 'Syntactic Root A1'
+            };
+            setSelectedWord(entry);
+            setDetailsLoading(false);
+        }, 800);
     };
 
     return (
         <div className="feature-container lexical-suite">
             <div className="feature-header">
-                <div className="pro-label-tag">LINGUISTIC CORE v2.2</div>
+                <div className="pro-label-tag">LINGUISTIC CORE v2.3</div>
                 <h2>Linguistic & Lexical Suite</h2>
-                <p>Syntactic breakdown and etymological mapping of the biblical text.</p>
+                <p>Deconstructing the scriptural bedrock through neural-linguistic mapping.</p>
             </div>
 
             <div className="lexical-controls glass-panel">
                 <div className="search-tabs">
-                    <button className={searchMode === 'verse' ? 'active' : ''} onClick={() => { setSearchMode('verse'); setInterlinearVerse([]); }}>Verse Interlinear</button>
-                    <button className={searchMode === 'lexicon' ? 'active' : ''} onClick={() => { setSearchMode('lexicon'); setSelectedWord(null); }}>Lexicon Search</button>
+                    <button className={searchMode === 'verse' ? 'active' : ''} onClick={() => setSearchMode('verse')}>Verse Interlinear</button>
+                    <button className={searchMode === 'lexicon' ? 'active' : ''} onClick={() => setSearchMode('lexicon')}>Lexicon Search</button>
                 </div>
                 <div className="lexical-search-row">
                     <input
@@ -116,9 +125,9 @@ const LexicalSuite = () => {
                     <div className="interlinear-row">
                         {interlinearVerse.map((word, idx) => (
                             <div
-                                key={`${word.id}-${idx}`}
-                                className={`interlinear-block ${selectedWord?.id === word.id ? 'active' : ''}`}
-                                onClick={() => setSelectedWord(getWordEntry(word))}
+                                key={`${word.id}-${idx} `}
+                                className={`interlinear-block ${detailsLoading && selectedWord?.id === word.id ? 'loading' : ''} ${selectedWord?.id === word.id ? 'active' : ''}`}
+                                onClick={() => handleWordClick(word)}
                             >
                                 <div className="greek-text">{word.greek}</div>
                                 <div className="translit-text">{word.translit}</div>
@@ -131,7 +140,12 @@ const LexicalSuite = () => {
             )}
 
             <div className="lexicon-details">
-                {selectedWord ? (
+                {detailsLoading ? (
+                    <div className="word-panel glass-panel analyzing-state">
+                        <span className="loader-pulse"></span>
+                        <p>Resolving Etymological Threads...</p>
+                    </div>
+                ) : selectedWord ? (
                     <div className="word-panel glass-panel animate-slide-in">
                         <div className="word-header">
                             <div className="word-identity">
@@ -143,7 +157,7 @@ const LexicalSuite = () => {
 
                         <div className="lexicon-grid">
                             <div className="lexicon-section main-def">
-                                <label>Core Definition</label>
+                                <label>Neural Definition</label>
                                 <p>{selectedWord.def}</p>
                             </div>
 
@@ -159,7 +173,7 @@ const LexicalSuite = () => {
                             </div>
                         </div>
 
-                        <div className="lexicon-section etymology">
+                        <div className="lexicon-section etymology highlight">
                             <label>Etymological Synthesis</label>
                             <p>{selectedWord.etymology}</p>
                         </div>
@@ -168,9 +182,9 @@ const LexicalSuite = () => {
                             <label>Semantic Field Mapping</label>
                             <div className="semantic-map">
                                 <div className="node-center">{selectedWord.english}</div>
-                                <div className="node-orbit" style={{ '--angle': '0deg' }}>Primary</div>
-                                <div className="node-orbit" style={{ '--angle': '120deg' }}>Derivative</div>
-                                <div className="node-orbit" style={{ '--angle': '240deg' }}>Contextual</div>
+                                <div className="node-orbit" style={{ '--angle': '0deg' }}>Core</div>
+                                <div className="node-orbit" style={{ '--angle': '120deg' }}>Intent</div>
+                                <div className="node-orbit" style={{ '--angle': '240deg' }}>Context</div>
                             </div>
                         </div>
                     </div>
@@ -179,12 +193,12 @@ const LexicalSuite = () => {
                         {isAnalyzing ? (
                             <div className="analyzing-state">
                                 <span className="loader-pulse"></span>
-                                <p>Deconstructing Syntactic Structures...</p>
+                                <p>Synthesizing Interlinear Data...</p>
                             </div>
                         ) : (
                             <>
                                 <p>Select a scriptural fragment to perform a deep lexical parse.</p>
-                                <div className="hint">Try: <strong>John 3:16</strong> or <strong>God</strong></div>
+                                <div className="hint">Try: <strong>John 3:16</strong> or <strong>Grace</strong></div>
                             </>
                         )}
                     </div>
