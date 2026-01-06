@@ -60,7 +60,21 @@ function App() {
     : '';
 
   if (isPro) {
-    return <TransformPro onBack={() => setIsPro(false)} />;
+    return (
+      <TransformPro
+        onBack={() => setIsPro(false)}
+        chapterData={chapterData}
+        currentBook={currentBook}
+        currentChapter={currentChapter}
+        loading={loading}
+        onBookChange={(book) => { setCurrentBook(book); setCurrentChapter(1); }}
+        onChapterChange={setCurrentChapter}
+        onNext={handleNext}
+        onPrev={handlePrev}
+        fullText={fullText}
+        BIBLE_BOOKS={BIBLE_BOOKS}
+      />
+    );
   }
 
   return (
