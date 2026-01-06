@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const AudioPlayer = ({ textToRead, reference }) => {
+const AudioPlayer = ({ textToRead, reference, compact }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [voices, setVoices] = useState([]);
