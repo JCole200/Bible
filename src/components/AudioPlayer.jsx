@@ -10,40 +10,67 @@ const AudioPlayer = ({ textToRead, reference }) => {
 
     useEffect(() => {
         // Load voices
-        // Load voices
         const loadVoices = () => {
             // Create a shallow copy to be safe
             let availableVoices = [...synth.getVoices()];
 
-            // Sort to prioritizing "Google" or "premium" voices if available
-            availableVoices.sort((a, b) => {
-                const aName = a.name.toLowerCase();
-                const bName = b.name.toLowerCase();
-                // Custom ranking for better voices
-                const isGoogle = (name) => name.includes('google');
-                const isPremium = (name) => name.includes('premium') || name.includes('enhanced');
+            // Filter for UK English
+            let ukVoices = availableVoices.filter(v => v.lang === 'en-GB' || v.lang.includes('GB'));
 
-                if (isGoogle(aName) && !isGoogle(bName)) return -1;
-                if (isGoogle(bName) && !isGoogle(aName)) return 1;
-                if (isPremium(aName) && !isPremium(bName)) return -1;
-                if (isPremium(bName) && !isPremium(aName)) return 1;
+            // If no UK voices, fallback to general English but warn/try best
+            if (ukVoices.length === 0) {
+                ukVoices = availableVoices.filter(v => v.lang.startsWith('en'));
+            }
 
-                return aName.localeCompare(bName);
-            });
+            // Try to find specifically one Male and one Female if possible
+            // Common names for UK voices: 
+            // Male: Daniel (Mac), Google UK English Male
+            // Female: Kate, Serena, Stephanie (Mac), Google UK English Female
 
-            // Filter to only the top 2 voices
-            // First try English, if that results in empty, take top 2 of all
-            let topVoices = availableVoices.filter(v => v.lang.startsWith('en'));
-            if (topVoices.length === 0) topVoices = availableVoices;
+            let maleVoice = ukVoices.find(v =>
+                v.name.includes('Male') ||
+                v.name.includes('Daniel') ||
+                v.name.includes('Arthur')
+            );
 
-            topVoices = topVoices.slice(0, 2);
+            let femaleVoice = ukVoices.find(v =>
+                v.name.includes('Female') ||
+                v.name.includes('Kate') ||
+                v.name.includes('Serena') ||
+                v.name.includes('Stephanie') ||
+                v.name.includes('Martha')
+            );
 
-            setVoices(topVoices);
+            // If we couldn't find specific genders, just take the top 2 sorted by "premium"
+            if (!maleVoice || !femaleVoice) {
+                ukVoices.sort((a, b) => {
+                    const isPremium = (name) => name.toLowerCase().includes('premium') || name.toLowerCase().includes('enhanced');
+                    if (isPremium(a.name) && !isPremium(b.name)) return -1;
+                    if (isPremium(b.name) && !isPremium(a.name)) return 1;
+                    return 0;
+                });
 
-            // Default to the first voice if none selected or current selection is not in list
-            if (!selectedVoice || !topVoices.find(v => v.name === selectedVoice.name)) {
-                if (topVoices.length > 0) {
-                    setSelectedVoice(topVoices[0]);
+                const top2 = ukVoices.slice(0, 2);
+                if (!maleVoice && top2[0]) maleVoice = top2[0];
+                if (!femaleVoice && top2[1]) femaleVoice = top2[1];
+            }
+
+            // Construct the list of 2 voices
+            const finalVoices = [];
+            if (maleVoice) finalVoices.push(maleVoice);
+
+            // Only add female if it's different logic or distinct object 
+            if (femaleVoice && (!maleVoice || femaleVoice.name !== maleVoice.name)) {
+                finalVoices.push(femaleVoice);
+            }
+
+            // If we somehow still have nothing (no voices in browser), empty array
+            setVoices(finalVoices);
+
+            // Default to the first voice
+            if (finalVoices.length > 0) {
+                if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
+                    setSelectedVoice(finalVoices[0]);
                 }
             }
         };
@@ -111,6 +138,17 @@ const AudioPlayer = ({ textToRead, reference }) => {
         setIsPaused(false);
     };
 
+    const getVoiceLabel = (voice) => {
+        // Intelligent labeling
+        if (voice.name.includes('Male') || voice.name.includes('Daniel') || voice.name.includes('Arthur')) {
+            return "Male (UK)";
+        }
+        if (voice.name.includes('Female') || voice.name.includes('Kate') || voice.name.includes('Serena') || voice.name.includes('Stephanie')) {
+            return "Female (UK)";
+        }
+        return voice.name.replace('Google', '').replace('English', '').replace('United Kingdom', '').replace('(Great Britain)', '').trim();
+    };
+
     return (
         <div className="glass-panel" style={{
             padding: '1rem',
@@ -147,15 +185,11 @@ const AudioPlayer = ({ textToRead, reference }) => {
                             maxWidth: 'auto'
                         }}
                     >
-                        {voices
-                            .slice(0, 2)
-                            .map(v => (
-                                <option key={v.name} value={v.name}>
-                                    {v.name.replace('Google', '').replace('English', '').replace('United States', '').trim()}
-                                    {v.name.toLowerCase().includes('female') ? ' (F)' : ''}
-                                    {v.name.toLowerCase().includes('male') ? ' (M)' : ''}
-                                </option>
-                            ))}
+                        {voices.map(v => (
+                            <option key={v.name} value={v.name}>
+                                {getVoiceLabel(v)}
+                            </option>
+                        ))}
                     </select>
                 )}
             </div>
