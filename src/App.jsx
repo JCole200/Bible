@@ -6,8 +6,10 @@ import AudioPlayer from './components/AudioPlayer';
 import NotesPanel from './components/NotesPanel';
 import DonateButton from './components/DonateButton';
 import logo from './assets/logo.png';
+import TransformPro from './pro/TransformPro';
 
 function App() {
+  const [isPro, setIsPro] = useState(false);
   const [currentBook, setCurrentBook] = useState('John');
   const [currentChapter, setCurrentChapter] = useState(1);
   const [chapterData, setChapterData] = useState(null);
@@ -57,6 +59,10 @@ function App() {
     ? chapterData.verses.map(v => v.text).join(' ')
     : '';
 
+  if (isPro) {
+    return <TransformPro onBack={() => setIsPro(false)} />;
+  }
+
   return (
     <>
       <nav className="glass-panel main-nav">
@@ -67,6 +73,23 @@ function App() {
           </div>
 
           <div className="header-actions">
+            <button
+              className="pro-action-btn"
+              onClick={() => setIsPro(true)}
+              style={{
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: 'white',
+                border: 'none',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+              }}
+            >
+              ✨ Transform Pro
+            </button>
             <button className="secondary theme-toggle" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}>
               {theme === 'light' ? '🌙' : '☀'}
             </button>
