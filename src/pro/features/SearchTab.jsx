@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { searchVerses } from '../../services/bibleApi';
+import { BIBLE_BOOKS } from '../../constants';
 
 const SearchTab = ({ onBookChange, onChapterChange }) => {
     const [query, setQuery] = useState('');
@@ -13,8 +14,8 @@ const SearchTab = ({ onBookChange, onChapterChange }) => {
         setSearching(true);
         try {
             const data = await searchVerses(query);
-            // bible-api.com returns { verses: [...] } 
-            setResults(data.verses || []);
+            // Bolls API returns { results: [...], ... }
+            setResults(data.results || []);
         } catch (error) {
             console.error("Search failed:", error);
             setResults([]);
@@ -23,14 +24,19 @@ const SearchTab = ({ onBookChange, onChapterChange }) => {
         }
     };
 
-    const jumpToPassage = (ref) => {
-        // Simple regex to extract Book and Chapter 
-        // e.g. "John 3:16" or "1 John 1:1"
-        const match = ref.match(/^(.+?)\s(\d+):/);
-        if (match) {
-            const book = match[1];
-            const chapter = parseInt(match[2]);
-            onBookChange(book);
+    const cleanText = (text) => {
+        // Remove <mark> tags, Strong's numbers <S>...</S>, and other tags
+        return text
+            .replace(/<S>\d+<\/S>/g, '') // Remove Strong's
+            .replace(/<[^>]+>/g, '')      // Remove HTML tags like <mark>
+            .replace(/\s+/g, ' ')        // Normalize whitespace
+            .trim();
+    };
+
+    const jumpToPassage = (bookId, chapter) => {
+        const bookName = BIBLE_BOOKS[bookId - 1];
+        if (bookName) {
+            onBookChange(bookName);
             onChapterChange(chapter);
         }
     };
@@ -62,15 +68,17 @@ const SearchTab = ({ onBookChange, onChapterChange }) => {
                         {results.map((res, i) => (
                             <div key={i} className="search-result-card animate-fade-in">
                                 <div className="result-header">
-                                    <span className="result-ref">{res.book_name} {res.chapter}:{res.verse}</span>
+                                    <span className="result-ref">
+                                        {BIBLE_BOOKS[res.book - 1]} {res.chapter}:{res.verse}
+                                    </span>
                                     <button
                                         className="jump-to-btn"
-                                        onClick={() => jumpToPassage(`${res.book_name} ${res.chapter}:${res.verse}`)}
+                                        onClick={() => jumpToPassage(res.book, res.chapter)}
                                     >
                                         Jump to Page →
                                     </button>
                                 </div>
-                                <p className="result-text">{res.text}</p>
+                                <p className="result-text">{cleanText(res.text)}</p>
                             </div>
                         ))}
                     </div>

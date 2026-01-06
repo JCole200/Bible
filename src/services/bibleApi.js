@@ -18,13 +18,15 @@ export async function getChapter(book, chapter) {
 }
 
 /**
- * Searches for verses containing a specific keyword.
+ * Searches for verses containing a specific keyword using Bolls API.
  * @param {string} query - The search query
+ * @param {string} translation - The translation slug (default: KJV)
  * @returns {Promise<object>} The search results
  */
-export async function searchVerses(query) {
+export async function searchVerses(query, translation = 'KJV') {
   try {
-    const response = await fetch(`${BASE_URL}/verses/${encodeURIComponent(query)}`);
+    const url = `https://bolls.life/v2/find/${translation}/?search=${encodeURIComponent(query)}&match_case=false&match_whole=true`;
+    const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to search verses');
     return await response.json();
   } catch (error) {
