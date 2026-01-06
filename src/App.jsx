@@ -40,6 +40,17 @@ function App() {
     }
   };
 
+  // Theme Management
+  const [theme, setTheme] = useState('dark');
+
+  useEffect(() => {
+    document.body.className = theme === 'light' ? 'light-mode' : '';
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   // Construct text for audio player
   const fullText = chapterData
     ? chapterData.verses.map(v => v.text).join(' ')
@@ -57,28 +68,39 @@ function App() {
         padding: '1rem 2rem',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Scripture<span style={{ color: 'var(--accent-color)' }}>.io</span></h1>
+          <img src="/src/assets/logo.png" alt="Logo" style={{ height: '40px' }} />
+          <h1 style={{ fontSize: '1.5rem', margin: 0, background: 'none', WebkitTextFillColor: 'initial', color: 'var(--text-color)' }}>
+            Premier Online Bible
+          </h1>
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <select
-            value={currentBook}
-            onChange={(e) => { setCurrentBook(e.target.value); setCurrentChapter(1); }}
-            style={{
-              background: 'rgba(0,0,0,0.3)',
-              color: 'white',
-              border: '1px solid var(--glass-border)',
-              padding: '0.5rem',
-              borderRadius: '6px'
-            }}
-          >
-            {BIBLE_BOOKS.map(book => (
-              <option key={book} value={book}>{book}</option>
-            ))}
-          </select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="secondary" onClick={toggleTheme} style={{ padding: '0.5rem', minWidth: 'auto' }} title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}>
+              {theme === 'light' ? '🌙' : '☀'}
+            </button>
+
+            <select
+              value={currentBook}
+              onChange={(e) => { setCurrentBook(e.target.value); setCurrentChapter(1); }}
+              style={{
+                background: 'rgba(50,50,50,0.3)',
+                color: 'var(--text-color)',
+                border: '1px solid var(--glass-border)',
+                padding: '0.5rem',
+                borderRadius: '6px'
+              }}
+            >
+              {BIBLE_BOOKS.map(book => (
+                <option key={book} value={book}>{book}</option>
+              ))}
+            </select>
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button className="secondary" onClick={handlePrev} disabled={currentChapter <= 1} style={{ padding: '0.5rem 1rem' }}>←</button>
