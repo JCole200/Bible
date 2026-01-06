@@ -1,0 +1,56 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StrongDefinition {
+  strongs_id      String       @id @db.VarChar(10)
+  lemma           String       @db.VarChar(100)
+  transliteration String?      @db.VarChar(100)
+  pronunciation   String?      @db.VarChar(100)
+  definition      String       @db.Text
+  morphology      Json?        @default("{}") // Stores tense, voice, mood, etc.
+  lexiconMaps     LexiconMap[]
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  @@map("strong_definitions")
+}
+
+model Verse {
+  id          Int          @id @default(autoincrement())
+  book        String       @db.VarChar(50)
+  chapter     Int
+  verse       Int
+  version     String       @default("KJV") @db.VarChar(10)
+  text        String       @db.Text
+  metadata    Json?        @default("{}")
+  lexiconMaps LexiconMap[]
+
+  @@unique([book, chapter, verse, version])
+  @@index([book, chapter, verse])
+  @@map("verses")
+}
+
+model LexiconMap {
+  id                 Int              @id @default(autoincrement())
+  verseId            Int              @map("verse_id")
+  strongsId          String           @map("strongs_id") @db.VarChar(10)
+  wordText           String           @map("word_text") @db.VarChar(100)
+  wordIndex          Int              @map("word_index")
+  morphologyOverride Json?            @map("morphology_override")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  
+  verse             Verse            @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  strongDefinition  StrongDefinition @relation(fields: [strongsId], references: [strongs_id])
+
+  @@index([verseId])
+  @@index([strongsId])
+  @@map("lexicon_map")
+}
