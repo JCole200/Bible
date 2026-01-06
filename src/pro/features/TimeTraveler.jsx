@@ -184,6 +184,11 @@ const TimeTraveler = () => {
                         <div className="model-3d-sim">
                             <div className="wireframe-orbit"></div>
                             <div className="wireframe-base"></div>
+                            <div className="model-id-label">RELIC-{activeLoc.name.toUpperCase()}</div>
+                        </div>
+                        <div className="ar-status-overlay">
+                            <span className="status-blink">REC</span>
+                            <span className="status-text">VOLUMETRIC LOCK: STABLE</span>
                         </div>
                     </div>
                     <button className="pro-action-btn-glow sm" onClick={() => alert("Initializing Neural VR Link...")}>
