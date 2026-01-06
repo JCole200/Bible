@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TransformPro.css';
+import AIResearch from './features/AIResearch';
+import TimeTraveler from './features/TimeTraveler';
+import LexicalSuite from './features/LexicalSuite';
+import CinematicAudio from './features/CinematicAudio';
+import MemorySRS from './features/MemorySRS';
 
 const TransformPro = ({ onBack }) => {
     const [activeTab, setActiveTab] = useState('research');
@@ -19,9 +24,11 @@ const TransformPro = ({ onBack }) => {
                     <div className="pro-badge">PRO</div>
                     <h1>Transform</h1>
                 </div>
-                <button onClick={onBack} className="secondary back-btn">
-                    ← Back to Free
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button onClick={onBack} className="secondary back-btn">
+                        ← Back to Free
+                    </button>
+                </div>
             </header>
 
             <div className="pro-layout">
@@ -42,26 +49,11 @@ const TransformPro = ({ onBack }) => {
                 </aside>
 
                 <main className="pro-content glass-panel">
-                    {activeTab === 'research' && (
-                        <div className="feature-placeholder">
-                            <h2>AI Theological Research Engine</h2>
-                            <p>Architecting RAG integration with historical commentaries...</p>
-                            <div className="ai-chat-mockup">
-                                <div className="ai-bubble">How does Spurgeon interpret the "Living Water" in John 4?</div>
-                                <div className="ai-response">
-                                    Spurgeon views the "Living Water" as the refreshing, eternal influence of the Holy Spirit...
-                                    <cite>[Spurgeon, Metropolitan Tabernacle Pulpit, Vol 14]</cite>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {activeTab !== 'research' && (
-                        <div className="feature-placeholder">
-                            <h2>{features.find(f => f.id === activeTab).name}</h2>
-                            <p>Feature under development according to architected roadmap.</p>
-                            <div className="loading-bar"><div className="progress"></div></div>
-                        </div>
-                    )}
+                    {activeTab === 'research' && <AIResearch />}
+                    {activeTab === 'traveler' && <TimeTraveler />}
+                    {activeTab === 'lexical' && <LexicalSuite />}
+                    {activeTab === 'audio' && <CinematicAudio />}
+                    {activeTab === 'retention' && <MemorySRS />}
                 </main>
             </div>
         </div>
