@@ -811,8 +811,133 @@
 }
 
 .metric strong {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     color: var(--accent-color);
+}
+
+.discovery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.live-telemetry {
+    margin-top: 1rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(59, 130, 246, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.tele-bar {
+    width: 60px;
+    height: 4px;
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 99px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tele-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-color);
+    width: 75%;
+    animation: teleProgress 2s ease-in-out infinite;
+}
+
+@keyframes teleProgress {
+
+    0%,
+    100% {
+        width: 30%;
+    }
+
+    50% {
+        width: 90%;
+    }
+}
+
+.live-telemetry span {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.live-badge {
+    padding: 0.2rem 0.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    font-size: 0.6rem;
+    font-weight: 800;
+    border-radius: 4px;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 5px var(--accent-color);
+    }
+
+    50% {
+        opacity: 0.6;
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+}
+
+.model-3d-sim {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wireframe-orbit {
+    width: 80px;
+    height: 80px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 50%;
+    position: absolute;
+    animation: rotate3d 8s linear infinite;
+}
+
+.wireframe-base {
+    width: 40px;
+    height: 40px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px solid var(--accent-color);
+    transform: rotateX(60deg) rotateZ(45deg);
+    animation: float3d 4s ease-in-out infinite;
+}
+
+@keyframes float3d {
+
+    0%,
+    100% {
+        transform: rotateX(60deg) rotateZ(45deg) translateY(0);
+    }
+
+    50% {
+        transform: rotateX(60deg) rotateZ(45deg) translateY(-10px);
+    }
 }
 
 .volumetric-viewport {
