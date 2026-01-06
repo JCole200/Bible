@@ -10,76 +10,78 @@ const AudioPlayer = ({ textToRead, reference }) => {
 
     useEffect(() => {
         // Load voices
+        // Load voices
         const loadVoices = () => {
-            // Create a shallow copy to be safe
             let availableVoices = [...synth.getVoices()];
 
             // Filter for UK English
-            let ukVoices = availableVoices.filter(v => v.lang === 'en-GB' || v.lang.includes('GB'));
+            let ukVoices = availableVoices.filter(v => v.lang.startsWith('en-GB') || v.lang.includes('GB'));
 
-            // If no UK voices, fallback to general English but warn/try best
+            // If no UK voices, fallback to general English (US/AU/etc)
             if (ukVoices.length === 0) {
                 ukVoices = availableVoices.filter(v => v.lang.startsWith('en'));
             }
 
-            // Try to find specifically one Male and one Female if possible
-            // Common names for UK voices: 
-            // Male: Daniel (Mac), Google UK English Male
-            // Female: Kate, Serena, Stephanie (Mac), Google UK English Female
-
-            let maleVoice = ukVoices.find(v =>
-                v.name.includes('Male') ||
-                v.name.includes('Daniel') ||
-                v.name.includes('Arthur')
-            );
-
-            let femaleVoice = ukVoices.find(v =>
-                v.name.includes('Female') ||
-                v.name.includes('Kate') ||
-                v.name.includes('Serena') ||
-                v.name.includes('Stephanie') ||
-                v.name.includes('Martha')
-            );
-
-            // If we couldn't find specific genders, just take the top 2 sorted by "premium"
-            if (!maleVoice || !femaleVoice) {
-                ukVoices.sort((a, b) => {
-                    const isPremium = (name) => name.toLowerCase().includes('premium') || name.toLowerCase().includes('enhanced');
-                    if (isPremium(a.name) && !isPremium(b.name)) return -1;
-                    if (isPremium(b.name) && !isPremium(a.name)) return 1;
-                    return 0;
-                });
-
-                const top2 = ukVoices.slice(0, 2);
-                if (!maleVoice && top2[0]) maleVoice = top2[0];
-                if (!femaleVoice && top2[1]) femaleVoice = top2[1];
+            // If still nothing, just use all available
+            if (ukVoices.length === 0) {
+                ukVoices = availableVoices;
             }
 
-            // Construct the list of 2 voices
+            // Heuristic for "Human/Realistic" quality
+            const getQualityScore = (voice) => {
+                const name = voice.name.toLowerCase();
+                if (name.includes('natural')) return 100;
+                if (name.includes('premium')) return 90;
+                if (name.includes('enhanced')) return 80;
+                if (name.includes('google')) return 70;
+                if (name.includes('daniel') || name.includes('serena') || name.includes('kate')) return 60;
+                return 0;
+            };
+
+            // Find best Male
+            const maleCandidates = ukVoices.filter(v =>
+                v.name.toLowerCase().includes('male') ||
+                v.name.toLowerCase().includes('daniel') ||
+                v.name.toLowerCase().includes('arthur') ||
+                v.name.toLowerCase().includes('oliver')
+            ).sort((a, b) => getQualityScore(b) - getQualityScore(a));
+
+            const maleVoice = maleCandidates[0];
+
+            // Find best Female
+            const femaleCandidates = ukVoices.filter(v =>
+                v.name.toLowerCase().includes('female') ||
+                v.name.toLowerCase().includes('kate') ||
+                v.name.toLowerCase().includes('serena') ||
+                v.name.toLowerCase().includes('stephanie') ||
+                v.name.toLowerCase().includes('martha') ||
+                v.name.toLowerCase().includes('samantha')
+            ).sort((a, b) => getQualityScore(b) - getQualityScore(a));
+
+            const femaleVoice = femaleCandidates[0];
+
+            // Final list
             const finalVoices = [];
             if (maleVoice) finalVoices.push(maleVoice);
-
-            // Only add female if it's different logic or distinct object 
             if (femaleVoice && (!maleVoice || femaleVoice.name !== maleVoice.name)) {
                 finalVoices.push(femaleVoice);
             }
 
-            // FALLBACK FOR MOBILE: If "strict" UK filtering failed (common on iOS/Android where list is small)
-            // Just take whatever English voices we have.
-            if (finalVoices.length === 0) {
-                const fallbackVoices = availableVoices.filter(v => v.lang.startsWith('en')).slice(0, 2);
-                setVoices(fallbackVoices);
-                if (fallbackVoices.length > 0 && !selectedVoice) {
-                    setSelectedVoice(fallbackVoices[0]);
-                }
-            } else {
-                setVoices(finalVoices);
+            // Emergency fallback: If we still don't have 2 distinct voices, just take the top 2 overall
+            if (finalVoices.length < 2) {
+                const others = ukVoices
+                    .sort((a, b) => getQualityScore(b) - getQualityScore(a))
+                    .filter(v => !finalVoices.find(fv => fv.name === v.name));
 
-                // Default to the first voice
-                if (finalVoices.length > 0) {
-                    if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
-                        setSelectedVoice(finalVoices[0]);
-                    }
+                finalVoices.push(...others.slice(0, 2 - finalVoices.length));
+            }
+
+            setVoices(finalVoices.slice(0, 2));
+
+            // Auto-select first voice if none selected
+            if (finalVoices.length > 0) {
+                if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
+                    setSelectedVoice(finalVoices[0]);
                 }
             }
         };
