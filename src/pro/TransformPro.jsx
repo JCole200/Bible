@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './TransformPro.css';
 import AIResearch from './features/AIResearch';
 import TimeTraveler from './features/TimeTraveler';
 import LexicalSuite from './features/LexicalSuite';
 import CinematicAudio from './features/CinematicAudio';
 import MemorySRS from './features/MemorySRS';
+import SearchTab from './features/SearchTab';
+import NotesFeature from './features/NotesFeature';
+import CrossReference from './features/CrossReference';
 import BibleReader from '../components/BibleReader';
 import logo from '../assets/logo.png';
+import { BIBLE_DATA } from '../constants';
 
 const TransformPro = ({
     onBack,
@@ -33,6 +37,12 @@ const TransformPro = ({
         { id: 'cross', icon: '🔗', name: 'Cross' },
         { id: 'search', icon: '🔍', name: 'Search' },
     ];
+
+    // Find current book's chapter count
+    const chapterCount = useMemo(() => {
+        const book = BIBLE_DATA.find(b => b.name === currentBook);
+        return book ? book.chapters : 0;
+    }, [currentBook]);
 
     return (
         <div className="pro-container">
@@ -68,7 +78,9 @@ const TransformPro = ({
                         onChange={(e) => onChapterChange(Number(e.target.value))}
                         className="pro-dropdown"
                     >
-                        <option>Chapter {currentChapter}</option>
+                        {Array.from({ length: chapterCount }, (_, i) => i + 1).map(ch => (
+                            <option key={ch} value={ch}>Chapter {ch}</option>
+                        ))}
                     </select>
 
                     <select className="pro-dropdown">
@@ -96,11 +108,11 @@ const TransformPro = ({
             <div className="pro-main-content">
                 {/* Scripture Panel (Left) */}
                 <section className="pro-scripture-area">
-                    <button className="nav-arrow left" onClick={onPrev}>‹</button>
+                    <button className="nav-arrow left" onClick={onPrev} disabled={currentChapter <= 1}>‹</button>
                     <div className="scripture-viewport">
                         <BibleReader chapterData={chapterData} loading={loading} />
                     </div>
-                    <button className="nav-arrow right" onClick={onNext}>›</button>
+                    <button className="nav-arrow right" onClick={onNext} disabled={currentChapter >= chapterCount}>›</button>
                 </section>
 
                 {/* Feature Panel (Right) */}
@@ -122,6 +134,9 @@ const TransformPro = ({
                         {activeTab === 'lexical' && <LexicalSuite />}
                         {activeTab === 'audio' && <CinematicAudio />}
                         {activeTab === 'retention' && <MemorySRS />}
+                        {activeTab === 'search' && <SearchTab />}
+                        {activeTab === 'notes' && <NotesFeature />}
+                        {activeTab === 'cross' && <CrossReference />}
                     </div>
                 </aside>
             </div>
