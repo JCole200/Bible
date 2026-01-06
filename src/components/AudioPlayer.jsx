@@ -203,17 +203,17 @@ const AudioPlayer = ({ textToRead, reference }) => {
     };
 
     return (
-        <div className="glass-panel" style={{
-            padding: '1rem',
+        <div className={`audio-player glass-panel ${compact ? 'compact' : ''}`} style={{
+            padding: compact ? '0.5rem 0.75rem' : '1rem',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
-            gap: '1rem',
+            gap: compact ? '0.5rem' : '1rem',
             width: 'fit-content',
             maxWidth: '100%'
         }}>
-            <div style={{ fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span>Audio Bible</span>
+            <div style={{ fontSize: compact ? '0.8rem' : '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className={compact ? 'hide-mobile' : ''}>Audio <span className="hide-tablet">Bible</span></span>
 
                 {voices.length > 0 && (
                     <select
@@ -231,8 +231,8 @@ const AudioPlayer = ({ textToRead, reference }) => {
                             color: 'var(--text-color)',
                             borderRadius: '6px',
                             padding: '0.25rem 0.5rem',
-                            fontSize: '0.8rem',
-                            maxWidth: 'auto'
+                            fontSize: '0.75rem',
+                            maxWidth: compact ? '80px' : 'auto'
                         }}
                     >
                         {voices.map(v => (
@@ -246,18 +246,18 @@ const AudioPlayer = ({ textToRead, reference }) => {
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {!isPlaying ? (
-                    <button onClick={handlePlay} title="Play">
+                    <button onClick={handlePlay} title="Play" style={compact ? { padding: '0.4rem 0.8rem', fontSize: '0.8rem' } : {}}>
                         ▶ {isPaused ? 'Resume' : 'Listen'}
                     </button>
                 ) : (
-                    <button onClick={handlePause} title="Pause" className="secondary">
+                    <button onClick={handlePause} title="Pause" className="secondary" style={compact ? { padding: '0.4rem 0.8rem', fontSize: '0.8rem' } : {}}>
                         ⏸ Pause
                     </button>
                 )}
 
                 {(isPlaying || isPaused || currentChunkIndex > 0) && (
-                    <button onClick={handleStop} title="Stop" className="secondary">
-                        ⏹ Stop
+                    <button onClick={handleStop} title="Stop" className="secondary" style={compact ? { padding: '0.4rem 0.8rem', fontSize: '0.8rem' } : {}}>
+                        ⏹
                     </button>
                 )}
             </div>
