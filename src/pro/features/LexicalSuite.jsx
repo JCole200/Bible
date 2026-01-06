@@ -34,7 +34,7 @@ const LexicalSuite = () => {
         }
     };
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         const query = searchTerm.toLowerCase().trim();
         if (!query) return;
 
@@ -42,33 +42,62 @@ const LexicalSuite = () => {
         setInterlinearVerse([]);
         setSelectedWord(null);
 
-        setTimeout(() => {
-            if (searchMode === 'verse') {
-                const results = lexicalDatabase.verses[query] || lexicalDatabase.verses[query.replace(/\s+/g, '')];
-                if (results) {
-                    setInterlinearVerse(results);
-                } else {
-                    const mockAtoms = query.split(/[ :]+/).filter(s => isNaN(s));
-                    const mockText = ["The", "Lord", "is", "my", "Shepherd"];
-                    const mockVerse = mockText.map((w, i) => ({
-                        greek: i % 2 === 0 ? '---' : 'λογos',
-                        translit: 'lex-gen',
-                        english: w,
-                        id: `G${2000 + i}`,
-                        parsing: 'Analytical'
-                    }));
-                    setInterlinearVerse(mockVerse);
+        if (searchMode === 'verse') {
+            try {
+                // Check High-Fidelity Database first
+                const cached = lexicalDatabase.verses[query] || lexicalDatabase.verses[query.replace(/\s+/g, '')];
+                if (cached) {
+                    setInterlinearVerse(cached);
+                    setIsAnalyzing(false);
+                    return;
                 }
-            } else {
+
+                // Real-time API Fetch for "Any Verse"
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Reference not found');
+
+                const data = await response.json();
+                const verseText = data.text.replace(/\r?\n|\r/g, " ").trim();
+                const wordsMatch = verseText.match(/\b\w+\b/g) || [];
+
+                // Map fetched words into the Lexical Engine
+                const adaptiveVerse = wordsMatch.map((w, i) => {
+                    const isVeryCommon = ['the', 'and', 'to', 'of', 'in', 'is', 'a', 'that', 'his', 'shall'].includes(w.toLowerCase());
+                    const greekVariants = ['λογος', 'θεος', 'αρχη', 'πνευμα', 'χαρις'];
+                    const mockGreek = greekVariants[i % greekVariants.length];
+
+                    return {
+                        greek: isVeryCommon ? '---' : mockGreek,
+                        translit: 'lex-neural',
+                        english: w,
+                        id: `V-${query.replace(/\s/g, '-')}-${i}`,
+                        parsing: isVeryCommon ? 'Grammatical-Particle' : 'Syntactic-Unit'
+                    };
+                });
+
+                setInterlinearVerse(adaptiveVerse);
+            } catch (err) {
+                console.error("analysis error:", err);
+                // Fallback for demo/offline
+                setInterlinearVerse([
+                    { greek: 'Error', translit: 'err', english: 'Search', id: 'E1', parsing: 'Invalid' },
+                    { greek: 'Ref', translit: 'ref', english: 'reference', id: 'E2', parsing: 'Check' }
+                ]);
+            } finally {
+                setIsAnalyzing(false);
+            }
+        } else { // searchMode === 'lexicon'
+            // Simulate a delay for lexicon search
+            setTimeout(() => {
                 const word = Object.values(lexicalDatabase.words).find(w =>
                     w.english.toLowerCase().includes(query) ||
                     w.translit.toLowerCase().includes(query) ||
                     w.lemma.includes(query)
                 );
                 if (word) handleWordClick(word);
-            }
-            setIsAnalyzing(false);
-        }, 1200);
+                setIsAnalyzing(false);
+            }, 1200);
+        }
     };
 
     const handleWordClick = (word) => {
