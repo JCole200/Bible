@@ -64,13 +64,22 @@ const AudioPlayer = ({ textToRead, reference }) => {
                 finalVoices.push(femaleVoice);
             }
 
-            // If we somehow still have nothing (no voices in browser), empty array
-            setVoices(finalVoices);
+            // FALLBACK FOR MOBILE: If "strict" UK filtering failed (common on iOS/Android where list is small)
+            // Just take whatever English voices we have.
+            if (finalVoices.length === 0) {
+                const fallbackVoices = availableVoices.filter(v => v.lang.startsWith('en')).slice(0, 2);
+                setVoices(fallbackVoices);
+                if (fallbackVoices.length > 0 && !selectedVoice) {
+                    setSelectedVoice(fallbackVoices[0]);
+                }
+            } else {
+                setVoices(finalVoices);
 
-            // Default to the first voice
-            if (finalVoices.length > 0) {
-                if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
-                    setSelectedVoice(finalVoices[0]);
+                // Default to the first voice
+                if (finalVoices.length > 0) {
+                    if (!selectedVoice || !finalVoices.find(v => v.name === selectedVoice.name)) {
+                        setSelectedVoice(finalVoices[0]);
+                    }
                 }
             }
         };

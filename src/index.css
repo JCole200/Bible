@@ -180,3 +180,58 @@ button.secondary:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+
+  /* Global Resets for Mobile */
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  /* Navigation Bar Adjustments */
+  nav.glass-panel {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1.5rem !important;
+    padding: 1.5rem 1rem !important;
+  }
+
+  nav.glass-panel>div {
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Make donate button full width on mobile for easier tapping */
+  nav.glass-panel>div:last-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  nav.glass-panel>div:last-child button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Audio Player */
+  .glass-panel>div {
+    justify-content: center;
+  }
+
+  /* Bible Text */
+  .bible-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+  }
+
+  /* Notes Panel */
+  div[style*="width: 350px"] {
+    width: 100% !important;
+  }
+}
