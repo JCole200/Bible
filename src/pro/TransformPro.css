@@ -490,268 +490,417 @@
     color: #93c5fd;
 }
 
-/* Time Traveler Map Styles */
-.map-interface {
+/* Time Traveler V2 - GIS Engine */
+.map-interface-v2 {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 0 !important;
+    border-radius: 20px;
     overflow: hidden;
+    height: 600px;
+    border: 1px solid var(--glass-border);
 }
 
-.map-controls {
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.2);
+.map-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 2rem;
+    background: rgba(0, 0, 0, 0.4);
     border-bottom: 1px solid var(--glass-border);
 }
 
-.layer-toggle {
+.coord-box {
     display: flex;
-    gap: 0.5rem;
+    gap: 1.5rem;
 }
 
-.layer-toggle button {
-    flex: 1;
-    padding: 0.5rem;
-    font-size: 0.8rem;
+.coord-label {
+    font-size: 0.75rem;
+    font-family: monospace;
+    opacity: 0.6;
+    color: var(--accent-color);
+}
+
+.view-modes {
+    display: flex;
     background: rgba(255, 255, 255, 0.05);
+    padding: 3px;
+    border-radius: 8px;
 }
 
-.layer-toggle button.active {
+.view-modes button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.view-modes button.active {
     background: var(--accent-color);
+    color: white;
 }
 
-.map-canvas {
-    height: 450px;
-    background: #0d1117;
+.map-viewport {
+    flex: 1;
     position: relative;
+    background: #0d1117;
     overflow: hidden;
 }
 
-.map-overlay {
+.map-canvas-core {
     width: 200%;
     height: 200%;
     position: absolute;
     top: -50%;
     left: -50%;
     transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    background-image:
-        radial-gradient(circle at center, transparent 0%, #0d1117 70%),
-        repeating-linear-gradient(rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 40px),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0px, rgba(255, 255, 255, 0.02) 1px, transparent 1px, transparent 40px);
 }
 
-.map-overlay.ancient {
+.map-grid-layer {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at center, transparent 0%, #0d1117 80%),
+        repeating-linear-gradient(rgba(59, 130, 246, 0.05) 0px, rgba(59, 130, 246, 0.05) 1px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0px, rgba(59, 130, 246, 0.05) 1px, transparent 1px, transparent 40px);
+}
+
+.map-canvas-core.ancient {
     background-color: #1a1510;
 }
 
-.map-overlay.modern {
+.map-canvas-core.modern {
     background-color: #10151a;
 }
 
-.marker-dot.pulse {
-    width: 14px;
-    height: 14px;
-    background: #f59e0b;
+.radar-sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.5) 0deg, transparent 90deg);
     border-radius: 50%;
-    box-shadow: 0 0 20px #f59e0b;
-    animation: markerPulse 2s infinite;
+    animation: radarScan 2s linear infinite;
+    z-index: 5;
 }
 
-@keyframes markerPulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+@keyframes radarScan {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
     }
 
-    70% {
-        transform: scale(3);
-        box-shadow: 0 0 0 15px rgba(245, 158, 11, 0);
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.target-marker-v2 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.marker-ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #f59e0b;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: pingMarker 2s ease-out infinite;
+}
+
+@keyframes pingMarker {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
     }
 
     100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
     }
 }
 
-.timeline-slider {
-    padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.3);
-    border-top: 1px solid var(--glass-border);
+.marker-point {
+    width: 10px;
+    height: 10px;
+    background: #f59e0b;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #f59e0b;
+}
+
+.marker-data-card {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    padding: 1rem 1.5rem;
+    min-width: 180px;
+    border: 1px solid var(--accent-color);
+    background: rgba(13, 17, 23, 0.9) !important;
+}
+
+.loc-title {
+    display: block;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.loc-subtitle {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.6;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.location-nav {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    align-items: center;
+    gap: 0.5rem;
+    z-index: 20;
 }
 
-.timeline-track {
-    width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    padding: 0 10px;
-}
-
-.timeline-point {
-    width: 12px;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    cursor: pointer;
+.location-nav button {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    text-align: left;
     transition: all 0.3s ease;
 }
 
-.timeline-point:hover,
-.timeline-point.active {
-    background: #f59e0b;
-    transform: scale(1.5);
-    box-shadow: 0 0 10px #f59e0b;
+.location-nav button.active {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    padding-left: 2rem;
 }
 
-.timeline-meta {
+.timeline-controller {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.timeline-track-v2 {
     display: flex;
     justify-content: space-between;
-    width: 100%;
-    font-size: 0.8rem;
+    position: relative;
 }
 
-.current-period {
-    font-weight: 800;
-    color: #f59e0b;
+.timeline-track-v2::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%);
+}
+
+.timeline-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.node-id {
+    width: 12px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.node-label {
+    font-size: 0.7rem;
     text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    font-weight: 800;
 }
 
-.period-year {
-    opacity: 0.5;
+.timeline-node.active .node-id {
+    background: #f59e0b;
+    transform: scale(1.5);
+    box-shadow: 0 0 15px #f59e0b;
 }
 
-/* Discovery Panel Styles */
-.pro-layout-secondary {
+.timeline-node.active .node-label {
+    opacity: 1;
+    color: #f59e0b;
+}
+
+/* Discovery Dashboard */
+.discovery-dashboard {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-top: 2rem;
 }
 
-.pro-layout-secondary.grid-2 {
-    grid-template-columns: 1fr 1fr;
-}
-
-.archaeology-panel {
-    padding: 2rem;
+.analysis-card,
+.rendering-card {
+    padding: 2.5rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.archaeology-panel h3 {
+.analysis-card h3,
+.rendering-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin: 0;
     font-size: 1.2rem;
     color: #f59e0b;
-}
-
-.discovery-text {
-    line-height: 1.6;
-    opacity: 0.8;
-    font-size: 1rem;
-}
-
-.discovery-stats {
-    display: flex;
-    gap: 2rem;
-    border-top: 1px solid var(--glass-border);
-    padding-top: 1.5rem;
-}
-
-.discovery-stats .stat {
-    display: flex;
-    flex-direction: column;
-}
-
-.discovery-stats .stat span {
-    font-size: 0.7rem;
     text-transform: uppercase;
-    opacity: 0.5;
     letter-spacing: 0.1em;
 }
 
-.discovery-stats .stat strong {
-    font-size: 1.2rem;
+.discovery-info p {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.discovery-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.metric label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+}
+
+.metric strong {
+    font-size: 1.4rem;
     color: var(--accent-color);
 }
 
-.model-viewer-mock {
-    height: 200px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 12px;
+.volumetric-viewport {
+    height: 300px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 1px dashed rgba(59, 130, 246, 0.2);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    border: 1px dashed rgba(245, 158, 11, 0.3);
 }
 
-.wireframe-cube {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #f59e0b;
-    position: relative;
+.wireframe-scanner {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
 }
 
-@keyframes spin-slow {
+.scanner-line {
+    width: 100%;
+    height: 1px;
+    background: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 15px var(--accent-color);
+    position: absolute;
+    top: 50%;
+    animation: scannerMotion 3s ease-in-out infinite;
+}
+
+@keyframes scannerMotion {
+    0% {
+        top: 0%;
+    }
+
+    50% {
+        top: 100%;
+    }
+
+    100% {
+        top: 0%;
+    }
+}
+
+.wireframe-cube-3d {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--accent-color);
+    animation: rotate3d 10s linear infinite;
+}
+
+@keyframes rotate3d {
     from {
-        transform: rotateX(0deg) rotateY(0deg);
+        transform: rotateX(45deg) rotateY(0deg);
     }
 
     to {
-        transform: rotateX(360deg) rotateY(360deg);
+        transform: rotateX(45deg) rotateY(360deg);
     }
 }
 
-.animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
+.pro-action-btn-glow {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+    transition: all 0.3s ease;
 }
 
-.animate-slide-in {
-    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+.pro-action-btn-glow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(245, 158, 11, 0.4);
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Feature Placeholder Utility */
-.feature-placeholder {
-    animation: slideUp 0.4s ease-out;
+/* Animations Utility */
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
 }
 
 @keyframes fadeIn {
     from {
         opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
 
     to {
@@ -761,22 +910,23 @@
 }
 
 @media (max-width: 1024px) {
-    .pro-layout {
+    .map-interface-v2 {
+        height: auto;
+    }
+
+    .discovery-dashboard {
         grid-template-columns: 1fr;
     }
 
-    .pro-sidebar {
+    .location-nav {
+        position: static;
         flex-direction: row;
-        overflow-x: auto;
-        padding-bottom: 1rem;
+        flex-wrap: wrap;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.3);
     }
 
-    .feature-tab {
-        min-width: 200px;
-        flex-shrink: 0;
-    }
-
-    .pro-layout-secondary.grid-2 {
-        grid-template-columns: 1fr;
+    .timeline-track-v2 {
+        padding: 0 1rem;
     }
 }
