@@ -930,3 +930,148 @@
         padding: 0 1rem;
     }
 }
+
+/* Lexical Suite Advanced Styles */
+.lexical-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem !important;
+    margin-bottom: 2rem;
+}
+
+.search-tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 1rem;
+}
+
+.search-tabs button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.search-tabs button.active {
+    color: var(--accent-color);
+}
+
+.search-tabs button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+.lexical-search-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.lexical-search-row input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+}
+
+.empty-lexicon {
+    padding: 4rem;
+    text-align: center;
+    opacity: 0.6;
+}
+
+.lexicon-grid {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.lexicon-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.semantic-map-box {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.semantic-map {
+    height: 300px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+}
+
+.node-center {
+    background: var(--accent-color);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 99px;
+    font-weight: 800;
+    z-index: 10;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+}
+
+.node-orbit {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    transform: rotate(var(--angle)) translate(120px) rotate(calc(-1 * var(--angle)));
+    animation: orbitFloat 6s ease-in-out infinite;
+    animation-delay: calc(var(--angle) * -0.01s);
+}
+
+@keyframes orbitFloat {
+
+    0%,
+    100% {
+        transform: rotate(var(--angle)) translate(120px) rotate(calc(-1 * var(--angle))) translateY(0);
+    }
+
+    50% {
+        transform: rotate(var(--angle)) translate(120px) rotate(calc(-1 * var(--angle))) translateY(-10px);
+    }
+}
+
+.hint {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
+
+.hint strong {
+    color: #f59e0b;
+}
+
+@media (max-width: 1024px) {
+    .lexicon-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lexical-search-row {
+        flex-direction: column;
+    }
+}
