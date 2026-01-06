@@ -5,6 +5,7 @@ import BibleReader from './components/BibleReader';
 import AudioPlayer from './components/AudioPlayer';
 import NotesPanel from './components/NotesPanel';
 import DonateButton from './components/DonateButton';
+import logo from './assets/logo.png';
 
 function App() {
   const [currentBook, setCurrentBook] = useState('John');
@@ -73,7 +74,7 @@ function App() {
         gap: '1rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src="/src/assets/logo.png" alt="Premier Logo" style={{ height: '40px' }} />
+          <img src={logo} alt="Premier Logo" style={{ height: '40px' }} />
           <h1 style={{ fontSize: '1.5rem', margin: 0, background: 'none', WebkitTextFillColor: 'initial', color: 'var(--text-color)' }}>
             Online Bible
           </h1>
