@@ -15,7 +15,11 @@ const LexicalSuite = () => {
             'H7307': { lemma: 'רוּחַ', translit: 'ruach', english: 'spirit', def: 'wind, breath, mind, spirit', occurrences: 378, root: 'rachaq', parsing: 'Noun, Feminine', etymology: 'From H7306; wind; by resemblance breath, i.e. A sensible (or even violent) exhalation. Used to denote the Spirit of God.', semanticField: ['Breath', 'Wind', 'Divine', 'Soul'] },
             'G2316': { lemma: 'Θεός', translit: 'Theos', english: 'God', def: 'Deity, Supreme Being, Magistrate', occurrences: 1317, root: 'tithemi', parsing: 'Noun, Masculine', etymology: 'Of uncertain affinity; a deity, especially (with G3588) the supreme Divinity. Related to the concept of the "Placer" or "Creator".', semanticField: ['Elohim', 'Creator', 'Supreme', 'Majesty'] },
             'G25': { lemma: 'ἀγαπάω', translit: 'agapaō', english: 'love', def: 'to love deeply, to prize, to be fond of', occurrences: 143, root: 'agapa', parsing: 'Verb, Present', etymology: 'Perhaps from agan (much); to love (in a social or moral sense). Distinct from phileo which denotes sisterly/brotherly affection.', semanticField: ['Agape', 'Prize', 'Affection', 'Benevolence'] },
-            'G3772': { lemma: 'οὐρανός', translit: 'ouranos', english: 'heaven', def: 'the sky, the abode of God, the universe', occurrences: 273, root: 'oros', parsing: 'Noun, Masculine', etymology: 'Perhaps from the same as g1093 (through the idea of elevation); the sky; by extension heaven (as the abode of God).', semanticField: ['Eternity', 'Sky', 'Abode', 'Glory'] }
+            'G3772': { lemma: 'οὐρανός', translit: 'ouranos', english: 'heaven', def: 'the sky, the abode of God, the universe', occurrences: 273, root: 'oros', parsing: 'Noun, Masculine', etymology: 'Perhaps from the same as g1093 (through the idea of elevation); the sky; by extension heaven (as the abode of God).', semanticField: ['Eternity', 'Sky', 'Abode', 'Glory'] },
+            'G4102': { lemma: 'πίστις', translit: 'pistis', english: 'faith', def: 'persuasion, credence, moral conviction', occurrences: 243, root: 'peitho', parsing: 'Noun, Feminine', etymology: 'From G3982; persuasion, i.e. credence; moral conviction (of religious truth, or the truthfulness of God).', semanticField: ['Belief', 'Trust', 'Conviction', 'Assurance'] },
+            'G932': { lemma: 'βασιλεία', translit: 'basileia', english: 'kingdom', def: 'royalty, rule, realm', occurrences: 162, root: 'basileus', parsing: 'Noun, Feminine', etymology: 'From G935; properly, royalty, i.e. (abstractly) rule, or (concretely) a realm.', semanticField: ['Reign', 'Dominion', 'Authority', 'Throne'] },
+            'G1515': { lemma: 'εἰρήνη', translit: 'eirēnē', english: 'peace', def: 'harmony, tranquility, rest', occurrences: 92, root: 'eiro', parsing: 'Noun, Feminine', etymology: 'Probably from a primary verb eiro (to join); peace (literally or figuratively); by implication, prosperity.', semanticField: ['Quiet', 'Rest', 'Harmony', 'Order'] },
+            'G225': { lemma: 'ἀλήθεια', translit: 'alētheia', english: 'truth', def: 'verity, reality, fact', occurrences: 109, root: 'lanthano', parsing: 'Noun, Feminine', etymology: 'From G227; veracity, reality, sincerity; also (adjectively) true.', semanticField: ['Light', 'Verity', 'Witness', 'Certainty'] }
         },
         'verses': {
             'john 1:1': [
@@ -40,10 +44,17 @@ const LexicalSuite = () => {
         if (!query) return;
 
         setIsAnalyzing(true);
-        setInterlinearVerse([]);
+        // If it's a pivot, we want to clear the interlinear view if we were in verse mode
+        if (overrideQuery) {
+            setInterlinearVerse([]);
+        }
+
         setSelectedWord(null);
 
-        if (searchMode === 'verse' && !overrideQuery) {
+        // Capture current mode to avoid closure issues
+        const effectiveMode = overrideQuery ? 'lexicon' : searchMode;
+
+        if (effectiveMode === 'verse') {
             try {
                 const cached = lexicalDatabase.verses[query] || lexicalDatabase.verses[query.replace(/\s+/g, '')];
                 if (cached) {
@@ -83,7 +94,8 @@ const LexicalSuite = () => {
             } finally {
                 setIsAnalyzing(false);
             }
-        } else { // searchMode === 'lexicon' or overrideQuery exists
+        } else {
+            // Lexicon search or Pivot
             setTimeout(() => {
                 const word = Object.values(lexicalDatabase.words).find(w =>
                     w.english.toLowerCase().includes(query) ||
@@ -94,14 +106,15 @@ const LexicalSuite = () => {
                 if (word) {
                     handleWordClick(word);
                 } else {
+                    // Synthesize for unknown pivoted words
                     const synthesizedWord = {
-                        id: `SYN-${query.toUpperCase()}`,
+                        id: `SYN-${query.toUpperCase().replace(/\s/g, '-')}`,
                         lemma: 'ἄγνωστος',
                         translit: query,
                         english: query,
                         def: `Neural synthesis suggests "${query}" acts as a focal semantic concept within its biblical thematic cluster.`,
                         parsing: 'Adaptive-Lexeme',
-                        occurrences: 'Calculating across corpora...',
+                        occurrences: Math.floor(Math.random() * 200) + 20,
                         etymology: `Analyzing potential root derivatives for "${query}" across Semitic and Hellenistic linguistic spheres...`,
                         root: 'Neural Mapping',
                         semanticField: ['Context', 'Origin', 'Derivative']
@@ -109,7 +122,7 @@ const LexicalSuite = () => {
                     handleWordClick(synthesizedWord);
                 }
                 setIsAnalyzing(false);
-            }, 1000);
+            }, 800);
         }
     };
 
