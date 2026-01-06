@@ -94,6 +94,21 @@ const TimeTraveler = () => {
                         <div className="map-grid-layer"></div>
                         <div className="map-topography-layer"></div>
 
+                        {/* Procedural Strata Features */}
+                        <div className="strata-features">
+                            {[...Array(5)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="strata-node"
+                                    style={{
+                                        left: `${(i * 25) + (Math.sin(i) * 10)}%`,
+                                        top: `${(i * 15) + (Math.cos(i) * 20)}%`,
+                                        '--delay': `${i * 0.5}s`
+                                    }}
+                                ></div>
+                            ))}
+                        </div>
+
                         {isScanning && <div className="radar-sweep"></div>}
 
                         <div className="target-marker-v2">

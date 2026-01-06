@@ -572,11 +572,87 @@
 }
 
 .map-canvas-core.ancient {
-    background-color: #1a1510;
+    background: #1a1510;
+    background-image:
+        radial-gradient(circle at 30% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 40px, rgba(245, 158, 11, 0.02) 40px, rgba(245, 158, 11, 0.02) 41px);
 }
 
 .map-canvas-core.modern {
-    background-color: #10151a;
+    background: #0d1117;
+    background-image:
+        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+    background-size: 20px 20px, 20px 20px, 100% 100%;
+}
+
+.map-topography-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+}
+
+.ancient .map-topography-layer {
+    background:
+        radial-gradient(circle at 20% 30%, rgba(245, 158, 11, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 80% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 25%),
+        radial-gradient(circle at 40% 70%, rgba(59, 130, 246, 0.1) 0%, transparent 30%);
+    filter: contrast(1.2) brightness(0.8);
+}
+
+.modern .map-topography-layer {
+    background:
+        repeating-linear-gradient(45deg, rgba(59, 130, 246, 0.02) 0, rgba(59, 130, 246, 0.02) 2px, transparent 2px, transparent 10px);
+}
+
+.map-grid-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+}
+
+.strata-features {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.strata-node {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    transform: rotate(45deg);
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+    animation: nodeFloat 4s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+.modern .strata-node {
+    border-color: rgba(59, 130, 246, 0.2);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+}
+
+@keyframes nodeFloat {
+
+    0%,
+    100% {
+        transform: rotate(45deg) translate(0, 0);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: rotate(45deg) translate(10px, -10px);
+        opacity: 0.8;
+    }
 }
 
 .radar-sweep {
@@ -644,19 +720,22 @@
 
 .marker-data-card {
     position: absolute;
-    top: 30px;
-    left: 30px;
-    padding: 1rem 1.5rem;
-    min-width: 180px;
+    top: 20px;
+    left: 20px;
+    padding: 0.8rem 1.2rem;
+    min-width: 150px;
     border: 1px solid var(--accent-color);
-    background: rgba(13, 17, 23, 0.9) !important;
+    background: rgba(13, 17, 23, 0.95) !important;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .loc-title {
     display: block;
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #fff;
+    letter-spacing: 0.05em;
 }
 
 .loc-subtitle {
