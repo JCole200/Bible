@@ -192,7 +192,7 @@ button.secondary:hover {
 .branding {
   display: flex;
   align-items: center;
-  gap: 0.15rem;
+  gap: 0;
 }
 
 .logo {
