@@ -25,16 +25,10 @@ const BibleReader = ({ chapterData, loading }) => {
 
             <div className="bible-text">
                 {chapterData.verses.map((verse) => (
-                    <React.Fragment key={verse.verse}>
-                        <span id={`v${verse.verse}`}>
-                            <span className="verse-num">{verse.verse}</span>
-                            {verse.text}
-                        </span>
-                        {/* Mock notes for standard benchmark: John 1 */}
-                        {(chapterData.reference === "John 1") && (verse.verse === 1 || verse.verse === 2) && (
-                            <div className="verse-note">| hello</div>
-                        )}
-                    </React.Fragment>
+                    <span key={verse.verse} id={`v${verse.verse}`}>
+                        <span className="verse-num">{verse.verse}</span>
+                        {verse.text}
+                    </span>
                 ))}
             </div>
 
