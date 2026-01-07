@@ -196,7 +196,7 @@ button.secondary:hover {
 }
 
 .logo {
-  height: 48px;
+  height: 64px;
 }
 
 .site-title {
@@ -276,10 +276,11 @@ button.secondary:hover {
 
   .site-title {
     font-size: 1.1rem;
+    display: none;
   }
 
   .logo {
-    height: 32px;
+    height: 40px;
   }
 
   .hide-mobile {

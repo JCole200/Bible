@@ -11,7 +11,7 @@ const DonateButton = ({ compact }) => {
                 fontWeight: 'bold'
             }}
         >
-            ❤ {compact ? '' : 'Donate'}
+            ❤ Donate
         </button>
     );
 };
